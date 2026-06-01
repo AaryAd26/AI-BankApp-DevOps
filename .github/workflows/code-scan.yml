@@ -19,10 +19,16 @@ jobs:
             java-version: '21'
             cache: 'maven'
         
+        - name: Initialize CodeQL
+          uses: github/codeql-action/init@v3
+          with:
+            languages: 'java-kotlin'
+            queries: security-extended 
+
         - name: Build the code with maven
           run: mvn clean install -DskipTests 
 
-        - name: Initialize CodeQL
+        - name: Analyze CodeQL
           uses: github/codeql-action/init@v3
           with:
             languages: 'java-kotlin'
