@@ -1,0 +1,22 @@
+name: code scanning
+
+on: 
+    push:
+        branches: [main]
+
+jobs:
+    scan-code:
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: code scanning
+          uses: actions/checkout@v4
+
+        - name: Set up JDK
+          uses: actions/setup-java@v4
+          with:
+            distribution: 'temurin'
+            java-version: '17'
+            cache: 'maven'
+        
+
