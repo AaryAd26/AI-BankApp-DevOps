@@ -19,4 +19,18 @@ jobs:
             java-version: '17'
             cache: 'maven'
         
+        - name: Build the code with maven
+          run: mvn clean install -DskipTests 
 
+        - name: OWASP Dependency-Check Scan
+          uses: dependency-check/Dependency-Check_Action@main
+          with:
+            project: 'Java-App'
+            path: '.'
+            format: 'SARIF'
+            out: 'reports'
+
+        - name: Upload Scan Results to GitHub Security
+          uses: github/codeql-action/upload-sarif@v3
+          with:
+            sarif_file: 'reports/dependency-check-report.sarif'
