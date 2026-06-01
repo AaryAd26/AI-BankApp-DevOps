@@ -16,7 +16,7 @@ jobs:
           uses: actions/setup-java@v4
           with:
             distribution: 'temurin'
-            java-version: '21git ad'
+            java-version: '21'
             cache: 'maven'
         
         - name: Build the code with maven
