@@ -63,7 +63,7 @@ public class ChatService {
 
         if (!transactions.isEmpty()) {
             sb.append("\n\nRecent transactions:");
-            int limit = Math.min(transactions.size(), 5);
+            transactions.subList(0, MAX_TRANSACTIONS);
             for (int i = 0; i < limit; i++) {
                 Transaction t = transactions.get(i);
                 sb.append("\n- ").append(t.getType())

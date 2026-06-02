@@ -1,6 +1,15 @@
 package com.example.bankapp.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +23,9 @@ import java.util.List;
 @Table(name = "accounts")
 public class Account implements UserDetails {
 
+    private static final int AMOUNT_PRECISION = 19;
+    private static final int AMOUNT_SCALE = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,10 +36,18 @@ public class Account implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(
+        nullable = false,
+        precision = AMOUNT_PRECISION,
+        scale = AMOUNT_SCALE
+    )
     private BigDecimal balance = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(
+        mappedBy = "account",
+        cascade = CascadeType.ALL,
+        fetch = FetchType.LAZY
+    )
     private List<Transaction> transactions = new ArrayList<>();
 
     public Account() {
@@ -38,8 +58,6 @@ public class Account implements UserDetails {
         this.password = password;
         this.balance = BigDecimal.ZERO;
     }
-
-    // Getters and setters
 
     public Long getId() {
         return id;
@@ -82,8 +100,6 @@ public class Account implements UserDetails {
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
     }
-
-    // UserDetails implementation
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

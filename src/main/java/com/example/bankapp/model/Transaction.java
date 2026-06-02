@@ -1,6 +1,14 @@
 package com.example.bankapp.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,11 +17,14 @@ import java.time.LocalDateTime;
 @Table(name = "transactions")
 public class Transaction {
 
+    private static final int AMOUNT_PRECISION = 19;
+    private static final int AMOUNT_SCALE = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = AMOUNT_PRECISION, scale = AMOUNT_SCALE)
     private BigDecimal amount;
 
     @Column(nullable = false)
