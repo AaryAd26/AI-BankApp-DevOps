@@ -1,7 +1,44 @@
-name: dependency check
+name: Dependency Check
 
 on:
-    workflow_call:
+  workflow_call:
 
-jobs: 
-    
+jobs:
+  dependency-scan:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build Project
+        run: mvn clean install -DskipTests
+
+      - name: Run OWASP Dependency Check
+        id: depcheck
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'java'
+          path: '.'
+          format: 'HTML'
+          out: 'reports'
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports
