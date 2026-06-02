@@ -4,7 +4,7 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: Test@123
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD} 
       MYSQL_DATABASE: bankappdb
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "-pTest@123"]
@@ -29,7 +29,7 @@ services:
       MYSQL_PORT: 3306
       MYSQL_DATABASE: bankappdb
       MYSQL_USER: root
-      MYSQL_PASSWORD: Test@123
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD} 
       OLLAMA_URL: http://ollama:11434
     depends_on:
       mysql:
