@@ -12,6 +12,8 @@ import java.util.Map;
 @Service
 public class ChatService {
 
+    private static final int MAX_TRANSACTIONS = 10;
+
     @Value("${ollama.url}")
     private String ollamaUrl;
 
@@ -39,13 +41,21 @@ public class ChatService {
         );
 
         try {
+            @SuppressWarnings("unchecked")
             Map<String, Object> response = restTemplate.postForObject(
-                ollamaUrl + "/api/chat", request, Map.class
+                ollamaUrl + "/api/chat",
+                request,
+                Map.class
             );
+
             if (response != null && response.containsKey("message")) {
-                Map<String, String> message = (Map<String, String>) response.get("message");
+                @SuppressWarnings("unchecked")
+                Map<String, String> message =
+                        (Map<String, String>) response.get("message");
+
                 return message.get("content");
             }
+
             return "Sorry, I couldn't process that.";
         } catch (Exception e) {
             return "AI assistant is unavailable. Please make sure Ollama is running.";
@@ -54,8 +64,10 @@ public class ChatService {
 
     private String buildContext(Account account, List<Transaction> transactions) {
         StringBuilder sb = new StringBuilder();
+
         sb.append("You are a helpful banking assistant for BankApp. ");
         sb.append("Keep answers short and friendly (2-3 sentences max). ");
+
         sb.append("\n\nCustomer details:");
         sb.append("\n- Username: ").append(account.getUsername());
         sb.append("\n- Balance: $").append(account.getBalance());
@@ -63,12 +75,18 @@ public class ChatService {
 
         if (!transactions.isEmpty()) {
             sb.append("\n\nRecent transactions:");
-            transactions.subList(0, MAX_TRANSACTIONS);
+
+            int limit = Math.min(transactions.size(), MAX_TRANSACTIONS);
+
             for (int i = 0; i < limit; i++) {
-                Transaction t = transactions.get(i);
-                sb.append("\n- ").append(t.getType())
-                  .append(": $").append(t.getAmount())
-                  .append(" on ").append(t.getTimestamp().toLocalDate());
+                Transaction transaction = transactions.get(i);
+
+                sb.append("\n- ")
+                  .append(transaction.getType())
+                  .append(": $")
+                  .append(transaction.getAmount())
+                  .append(" on ")
+                  .append(transaction.getTimestamp().toLocalDate());
             }
         } else {
             sb.append("\n\nNo transactions yet.");
