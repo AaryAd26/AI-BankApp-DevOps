@@ -1,0 +1,8 @@
+name: docker linting
+
+on:
+    workflow_call:
+
+jobs:
+    docker-linting:
+        runs-on: ubuntu-latest
