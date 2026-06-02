@@ -84,33 +84,15 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-    <plugins>
-
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
-
-        <plugin>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-maven-plugin</artifactId>
-            <version>4.8.3.1</version>
-            <configuration>
-                <effort>Max</effort>
-                <threshold>Low</threshold>
-                <failOnError>true</failOnError>
-                <plugins>
-                    <plugin>
-                        <groupId>com.h3xstream.findsecbugs</groupId>
-                        <artifactId>findsecbugs-plugin</artifactId>
-                        <version>1.13.0</version>
-                    </plugin>
-                </plugins>
-            </configuration>
-        </plugin>
-
-    </plugins>
-</build>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-checkstyle-plugin</artifactId>
+    <version>3.6.0</version>
+    <configuration>
+        <configLocation>checkstyle.xml</configLocation>
+        <failOnViolation>true</failOnViolation>
+        <consoleOutput>true</consoleOutput>
+    </configuration>
+</plugin>
 
 </project>

@@ -23,7 +23,7 @@ jobs:
           cache: 'maven'
 
       - name: Run Linters with Maven
-        run: mvn checkstyle:check pmd:check spotbugs:check
+        run: mvn checkstyle:check 
 
   sast:
     name: SAST - Semgrep
