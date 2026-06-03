@@ -4,7 +4,8 @@ on:
   workflow_call:
 
 jobs:
-  validate:
+  code-quality:
+    name: Lint & SAST - Checkstyle + SpotBugs
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -22,13 +23,28 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Run Linters with Maven
-        run: mvn checkstyle:check 
+      - name: Run Checkstyle (lint)
+        run: mvn checkstyle:check
 
-  sast:
+      - name: Compile
+        run: mvn compile -DskipTests
+
+      - name: Run SpotBugs (SAST)
+        run: mvn spotbugs:check
+
+      - name: Upload SpotBugs SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: target/spotbugs.sarif
+          category: spotbugs
+
+  semgrep:
     name: SAST - Semgrep
     runs-on: ubuntu-latest
-    needs: validate
+    permissions:
+      security-events: write
+      actions: read
 
     steps:
       - name: Checkout code
@@ -41,3 +57,11 @@ jobs:
             p/java
             p/owasp-top-ten
             p/secrets
+
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep

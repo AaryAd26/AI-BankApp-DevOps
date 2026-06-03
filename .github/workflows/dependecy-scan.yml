@@ -22,18 +22,37 @@ jobs:
           java-version: '21'
           cache: maven
 
+          
+      - name: Cache NVD Database
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/dependency-check
+          key: nvd-cache-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            nvd-cache-${{ runner.os }}-
+
       - name: Build Project
-        run: mvn clean install -DskipTests
+        run: mvn clean install -DskipTests --no-transfer-progress
 
       - name: Run OWASP Dependency Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }} 
         run: |
           mvn org.owasp:dependency-check-maven:check \
             -Dformat=HTML \
-            -DfailBuildOnCVSS=7
+            -Dformat=JSON \
+            -DfailBuildOnCVSS=7 \
+            -DnvdApiKey=${{ secrets.NVD_API_KEY }} \
+            -Ddata.directory=$HOME/.cache/dependency-check \
+            -DsuppressionFile=.github/owasp-suppressions.xml \
+            --no-transfer-progress
 
       - name: Upload Dependency Check Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
-          path: target/dependency-check-report.html
+          path: |
+            target/dependency-check-report.html
+            target/dependency-check-report.json
+          retention-days: 14
