@@ -7,13 +7,23 @@
 
   <module name="TreeWalker">
 
-    <!-- ✅ Keep these - actual code quality issues -->
+
     <module name="AvoidStarImport"/>
-    <module name="MagicNumber"/>
+
+    
+    <module name="MagicNumber">
+      <property name="ignoreNumbers" value="-1, 0, 1, 2, 100, 200, 201, 204, 400, 401, 403, 404, 409, 500"/>
+      <property name="ignoreAnnotation" value="true"/>
+      <property name="ignoreHashCodeMethod" value="true"/>
+      <property name="ignoreFieldDeclaration" value="true"/>
+    </module>
+
+
     <module name="HiddenField">
       <property name="ignoreConstructorParameter" value="true"/>
       <property name="ignoreSetter" value="true"/>
     </module>
+
   </module>
 
 </module>

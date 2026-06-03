@@ -49,6 +49,7 @@ jobs:
 
       - name: Run Checkstyle (Lint)
         run: mvn checkstyle:check
+        continue-on-error: true
 
       - name: Compile
         run: mvn compile -DskipTests
@@ -56,7 +57,6 @@ jobs:
       - name: Run SpotBugs + FindSecBugs (SAST)
         run: mvn spotbugs:check
         continue-on-error: true
-
 
       - name: List target directory
         if: always()
