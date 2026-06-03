@@ -3,4 +3,4 @@ services:
   web:
     image: ${DOCKERHUB_USERNAME}/ai-bankapp:$DOCKER_TAG
     ports:
-      - "80:80"
+      - "8080:8080"
