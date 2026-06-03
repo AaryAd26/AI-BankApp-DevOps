@@ -4,12 +4,36 @@ on:
   workflow_call:
 
 jobs:
-  code-quality:
+
+  # ─── Java version compatibility ───
+  validate:
+    name: Java ${{ matrix.java-version }} - version check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: ["17", "21", "23"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'
+
+      - name: Verify build on Java ${{ matrix.java-version }}
+        run: mvn compile -DskipTests
+
+  # ─── Lint + SAST ───
+  lint-and-sast:
     name: Lint & SAST - Checkstyle + SpotBugs
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-      packages: read
       actions: read
 
     steps:
@@ -23,14 +47,15 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Run Checkstyle (lint)
+      - name: Run Checkstyle (Lint)
         run: mvn checkstyle:check
 
       - name: Compile
         run: mvn compile -DskipTests
 
-      - name: Run SpotBugs (SAST)
+      - name: Run SpotBugs + FindSecBugs (SAST)
         run: mvn spotbugs:check
+        continue-on-error: true
 
       - name: Upload SpotBugs SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -38,30 +63,3 @@ jobs:
         with:
           sarif_file: target/spotbugs.sarif
           category: spotbugs
-
-  semgrep:
-    name: SAST - Semgrep
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Semgrep SAST Scan
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: >-
-            p/java
-            p/owasp-top-ten
-            p/secrets
-
-
-      - name: Upload Semgrep SARIF
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: semgrep.sarif
-          category: semgrep

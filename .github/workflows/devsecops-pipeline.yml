@@ -1,35 +1,59 @@
-name: DevSecOps End-to-end pipeline
+name: DevSecOps End-to-end Pipeline
 
-on: 
-    push:
-        branches: [main]
+on:
+  push:
+    branches: [main]
 
 jobs:
-    # section : CI (Continuos Integration with security scanning)
-    code-quality:
-        uses: ./.github/workflows/code-scan.yml
 
-    secrets-scan:
-        uses: ./.github/workflows/secrets-scan.yml
+  code-scan:
+    name: code-quality
+    uses: ./.github/workflows/code-scan.yml
+    permissions:
+      security-events: write
+      actions: read
+      packages: read
 
-    dependecy-scan:
-        uses: ./.github/workflows/dependecy-scan.yml
+  secrets-scan:
+    name: secrets-scan
+    uses: ./.github/workflows/secrets-scan.yml
+    permissions:
+      security-events: write
+      actions: read
 
-    docker-scan:
-        uses: ./.github/workflows/docker-lint.yml
+  dependency-scan:
+    name: dependecy-scan
+    uses: ./.github/workflows/dependecy-scan.yml
+    permissions:
+      security-events: write
+      actions: read
 
-    # Build once the security's scan are complete 
-    build:
-        needs: [code-quality,secrets-scan,dependecy-scan,docker-scan]
-        uses: ./.github/workflows/docker-build-push.yml
-        secrets: inherit
+  docker-lint:
+    name: docker-scan
+    uses: ./.github/workflows/docker-lint.yml
+    permissions:
+      actions: read
 
-    trivy:
-        needs: [build]
-        uses: ./.github/workflows/image-scan.yml
-        secrets: inherit 
+  build:
+    name: build
+    needs: [code-scan, secrets-scan, dependency-scan, docker-lint]
+    uses: ./.github/workflows/docker-build-push.yml
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit
 
-    deploy:
-        needs: [trivy]
-        uses: ./.github/workflows/deploy-to-server.yml
-        secrets: inherit
+  trivy:
+    name: trivy
+    needs: build
+    uses: ./.github/workflows/image-scan.yml
+    permissions:
+      security-events: write
+      actions: read
+    secrets: inherit
+
+  deploy:
+    name: deploy
+    needs: trivy
+    uses: ./.github/workflows/deploy-to-server.yml
+    secrets: inherit
