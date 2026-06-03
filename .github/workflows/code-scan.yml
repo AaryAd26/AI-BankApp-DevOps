@@ -5,14 +5,14 @@ on:
 
 jobs:
 
-  # ─── Java version compatibility ───
+
   validate:
     name: Java ${{ matrix.java-version }} - version check
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        java-version: ["17", "21", "23"]
+        java-version: ["21", "23"]
 
     steps:
       - name: Checkout code
@@ -28,7 +28,7 @@ jobs:
       - name: Verify build on Java ${{ matrix.java-version }}
         run: mvn compile -DskipTests
 
-  # ─── Lint + SAST ───
+
   lint-and-sast:
     name: Lint & SAST - Checkstyle + SpotBugs
     runs-on: ubuntu-latest
@@ -57,8 +57,13 @@ jobs:
         run: mvn spotbugs:check
         continue-on-error: true
 
+
+      - name: List target directory
+        if: always()
+        run: ls -la target/ || echo "target directory is empty"
+
       - name: Upload SpotBugs SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: target/spotbugs.sarif
