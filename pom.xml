@@ -19,7 +19,6 @@
 		<java.version>21</java.version>
 		<tomcat.version>10.1.52</tomcat.version>
 		<jackson-bom.version>2.18.6</jackson-bom.version>
-
 		<spotbugs-maven-plugin.version>4.8.6.4</spotbugs-maven-plugin.version>
 		<findsecbugs-plugin.version>1.13.0</findsecbugs-plugin.version>
 		<maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
@@ -76,37 +75,70 @@
 	</dependencies>
 
 	<build>
-		<plugin>
-  <groupId>com.github.spotbugs</groupId>
-  <artifactId>spotbugs-maven-plugin</artifactId>
-  <version>${spotbugs-maven-plugin.version}</version>
-  <configuration>
-    <effort>Max</effort>
-    <threshold>Low</threshold>
-    <failsOnError>true</failsOnError>
-    <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
-    <sarifOutput>${project.build.directory}/spotbugs.sarif</sarifOutput>
-    <formats>
-      <format>sarif</format>
-      <format>xml</format>
-    </formats>
-    <plugins>
-      <plugin>
-        <groupId>com.h3xstream.findsecbugs</groupId>
-        <artifactId>findsecbugs-plugin</artifactId>
-        <version>${findsecbugs-plugin.version}</version>
-      </plugin>
-    </plugins>
-  </configuration>
-  <executions>
-    <execution>
-      <id>spotbugs-check</id>
-      <phase>verify</phase>
-      <goals>
-        <goal>check</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>
+		<plugins>
+
+			<!-- Spring Boot -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<!-- SpotBugs + FindSecBugs -->
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs-maven-plugin.version}</version>
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<failsOnError>true</failsOnError>
+					<excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+					<sarifOutput>${project.build.directory}/spotbugs.sarif</sarifOutput>
+					<formats>
+						<format>sarif</format>
+						<format>xml</format>
+					</formats>
+					<plugins>
+						<plugin>
+							<groupId>com.h3xstream.findsecbugs</groupId>
+							<artifactId>findsecbugs-plugin</artifactId>
+							<version>${findsecbugs-plugin.version}</version>
+						</plugin>
+					</plugins>
+				</configuration>
+				<executions>
+					<execution>
+						<id>spotbugs-check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Checkstyle -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${maven-checkstyle-plugin.version}</version>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<failOnViolation>true</failOnViolation>
+					<consoleOutput>true</consoleOutput>
+				</configuration>
+				<executions>
+					<execution>
+						<id>checkstyle-check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
 
 </project>
